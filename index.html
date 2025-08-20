@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Grading Kelapa Sawit</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .header h2 {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .header h3 {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #777;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .section-title {
+            background-color: #2c3e50;
+            color: white;
+            padding: 8px;
+            margin: 15px 0 10px 0;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1a2530;
+        }
+
+        #export-pdf {
+            background-color: #27ae60;
+        }
+
+        #export-pdf:hover {
+            background-color: #219653;
+        }
+
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .signature div {
+            text-align: center;
+            width: 30%;
+        }
+
+        .signature input {
+            width: 100%;
+            margin-bottom: 5px;
+            border: none;
+            border-bottom: 1px solid #000;
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        .signature div div:last-child {
+            margin-top: 25px;
+            font-style: italic;
+            color: #555;
+        }
+
+        /* Styling untuk bagian foto */
+        .photo-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+        }
+
+        .photo-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-item .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-btn {
+            background-color: #3498db;
+        }
+
+        .camera-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <div class="header">
+            <h1>PT. HASNUR CITRA TERPADU</h1>
+            <h2>PKS - SUNGAI PUTING</h2>
+            <h3>LEMBAR KERJA GRADING - LEMBARAN PEMERIKSAAN MUTU GRADING</h3>
+        </div>
+
+        <div>
+            <table>
+                <tr>
+                    <td width="15%">No. Tiket</td>
+                    <td width="35%"><input type="text" id="No_Tiket"></td>
+                    <td width="15%">Tanggal</td>
+                    <td width="35%"><input type="text" id="Tanggal"></td>
+                </tr>
+                <tr>
+                    <td>No. Kendaraan</td>
+                    <td><input type="text" id="No_Kendaraan"></td>
+                    <td>Divisi/Estate</td>
+                    <td><input type="text" id="Divisi_Estate"></td>
+                </tr>
+                <tr>
+                    <td>Jam Tiba/Grading</td>
+                    <td><input type="text" id="Jam_Tiba_Grading"></td>
+                    <td>Blok/Thn. Tanam</td>
+                    <td><input type="text" id="Blok_Thn_Tanam"></td>
+                </tr>
+                <tr>
+                    <td>No. Trip</td>
+                    <td><input type="text" id="No_Trip"></td>
+                    <td>Berat Bersih</td>
+                    <td><input type="text" id="Berat_Bersih"></td>
+                </tr>
+                <tr>
+                    <td>Jumlah Janjang SPB</td>
+                    <td><input type="text" id="Jumlah_Janjang_SPB"></td>
+                    <td>BJR</td>
+                    <td><input type="text" id="BJR"></td>
+                </tr>
+                <tr>
+                    <td>Janjang di Grading</td>
+                    <td><input type="text" id="Janjang_di_Grading"></td>
+                    <td>Minimum Kematangan Panen</td>
+                    <td><input type="text" id="Minimum_Kematangan_Panen"></td>
+                </tr>
+                <tr>
+                    <td>Brondolan Lepas Janjang</td>
+                    <td colspan="3"><input type="text" id="Brondolan_Lepas_Janjang"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section-title">A. Kematangan dan Persentase (%) Brondolan Lepas</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>GOLONGAN</th>
+                    <th>JUMLAH JANJANG</th>
+                    <th>%</th>
+                    <th>TARGET</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Buah Mentah</td>
+                    <td><input type="number" id="buah_mentah_jumlah"></td>
+                    <td><input type="number" id="buah_mentah_persen"></td>
+                    <td>0%</td>
+                </tr>
+                <tr>
+                    <td>Buah Matang</td>
+                    <td><input type="number" id="buah_matang_jumlah"></td>
+                    <td><input type="number" id="buah_matang_persen"></td>
+                    <td>max 92%</td>
+                </tr>
+                <tr>
+                    <td>Buah Terlalu Matang</td>
+                    <td><input type="number" id="buah_terlalu_matang_jumlah"></td>
+                    <td><input type="number" id="buah_terlalu_matang_persen"></td>
+                    <td>max 5%</td>
+                </tr>
+                <tr>
+                    <td>Janjang Kosong</td>
+                    <td><input type="number" id="janjang_kosong_jumlah"></td>
+                    <td><input type="number" id="janjang_kosong_persen"></td>
+                    <td>0%</td>
+                </tr>
+                <tr>
+                    <td>Total Buah Normal</td>
+                    <td><input type="number" id="total_buah_normal_jumlah"></td>
+                    <td><input type="number" id="total_buah_normal_persen"></td>
+                    <td>max 96%</td>
+                </tr>
+                <tr>
+                    <td>Parthenocarpic</td>
+                    <td><input type="number" id="parthenocarpic_jumlah"></td>
+                    <td><input type="number" id="parthenocarpic_persen"></td>
+                    <td>0%</td>
+                </tr>
+                <tr>
+                    <td>Buah Keras (Hard Bunch)</td>
+                    <td><input type="number" id="buah_keras_jumlah"></td>
+                    <td><input type="number" id="buah_keras_persen"></td>
+                    <td>max 3%</td>
+                </tr>
+                <tr>
+                    <td>Total Buah Abnormal</td>
+                    <td><input type="number" id="total_buah_abnormal_jumlah"></td>
+                    <td><input type="number" id="total_buah_abnormal_persen"></td>
+                    <td>max 3%</td>
+                </tr>
+                <tr>
+                    <td>GRAND TOTAL</td>
+                    <td><input type="number" id="grand_total_jumlah"></td>
+                    <td><input type="number" id="grand_total_persen"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Brondolan Lepas</td>
+                    <td><input type="number" id="brondolan_lepas_jumlah"></td>
+                    <td><input type="number" id="brondolan_lepas_persen"></td>
+                    <td>8%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">B. Kerusakan Akibat Hama Tikus</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>KATEGORI</th>
+                    <th>JUMLAH JANJANG</th>
+                    <th>%</th>
+                    <th>TARGET</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Kerusakan Ringan</td>
+                    <td><input type="number" id="rusak_ringan_jumlah"></td>
+                    <td><input type="number" id="rusak_ringan_persen"></td>
+                    <td>max 95%</td>
+                </tr>
+                <tr>
+                    <td>Kerusakan Sedang</td>
+                    <td><input type="number" id="rusak_sedang_jumlah"></td>
+                    <td><input type="number" id="rusak_sedang_persen"></td>
+                    <td>max 5%</td>
+                </tr>
+                <tr>
+                    <td>Kerusakan Berat</td>
+                    <td><input type="number" id="rusak_berat_jumlah"></td>
+                    <td><input type="number" id="rusak_berat_persen"></td>
+                    <td>0%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table>
+            <tr>
+                <td width="20%">Batu Kerikil/Sampah</td>
+                <td width="15%"><input type="number" id="batu_kerikil"> kg</td>
+                <td width="65%"></td>
+            </tr>
+            <tr>
+                <td>Comment</td>
+                <td colspan="2"><input type="text" id="comment" style="width: 100%;"></td>
+            </tr>
+            <tr>
+                <td>Diperiksa_Oleh</td>
+                <td colspan="2"><input type="text" id="Diperiksa_Oleh" style="width: 100%;"></td>
+            </tr>
+        </table>
+
+        <!-- Bagian Foto -->
+        <div class="section-title">Foto Dokumentasi</div>
+        <div class="photo-section">
+            <div class="photo-upload">
+                <input type="file" id="photo-upload" accept="image/*" multiple>
+                <button class="camera-btn" id="camera-btn">Ambil Foto dari Kamera</button>
+            </div>
+            <div class="photo-preview" id="photo-preview">
+                <!-- Foto yang diunggah akan ditampilkan di sini -->
+            </div>
+        </div>
+
+        <div class="signature">
+            <div>
+                <div>Team Grading</div>
+                <input type="text" id="team_grading">
+                <div>(........................)</div>
+            </div>
+            <div>
+                <div>Asst. Lab/Kebun</div>
+                <input type="text" id="asst_lab">
+                <div>(........................)</div>
+            </div>
+            <div>
+                <div>Mill Manager</div>
+                <input type="text" id="mill_manager">
+                <div>(........................)</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button onclick="resetForm()">Reset Form</button>
+            <button id="export-pdf" onclick="exportToPDF()">Export to PDF</button>
+        </div>
+    </div>
+
+    <script>
+        const {jsPDF} = window.jspdf;
+        let uploadedPhotos = [];
+
+        // Fungsi untuk menangani unggahan foto
+        document.getElementById('photo-upload').addEventListener('change', function (e) {
+            handlePhotoUpload(e.target.files);
+        });
+
+        // Fungsi untuk mengaktifkan kamera
+        document.getElementById('camera-btn').addEventListener('click', function () {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment'; // Untuk kamera belakang di perangkat mobile
+            input.addEventListener('change', function (e) {
+                handlePhotoUpload(e.target.files);
+            });
+            input.click();
+        });
+
+        // Fungsi untuk menangani unggahan foto
+        function handlePhotoUpload(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const photoData = {
+                        id: Date.now() + i,
+                        dataUrl: e.target.result
+                    };
+
+                    uploadedPhotos.push(photoData);
+                    displayPhoto(photoData);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Fungsi untuk menampilkan foto di preview
+        function displayPhoto(photoData) {
+            const photoPreview = document.getElementById('photo-preview');
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item';
+            photoItem.dataset.id = photoData.id;
+
+            const img = document.createElement('img');
+            img.src = photoData.dataUrl;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-photo';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = function () {
+                removePhoto(photoData.id);
+            };
+
+            photoItem.appendChild(img);
+            photoItem.appendChild(removeBtn);
+            photoPreview.appendChild(photoItem);
+        }
+
+        // Fungsi untuk menghapus foto
+        function removePhoto(id) {
+            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== id);
+            const photoItem = document.querySelector(`.photo-item[data-id="${id}"]`);
+            if (photoItem) {
+                photoItem.remove();
+            }
+        }
+
+        // Fungsi untuk mengekspor ke PDF
+        function exportToPDF() {
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text("PT. HASNUR CITRA TERPADU", 105, 15, {align: 'center'});
+            doc.setFontSize(14);
+            doc.text("PKS - SUNGAI PUTING", 105, 22, {align: 'center'});
+            doc.setFontSize(12);
+            doc.text("LEMBAR KERJA GRADING - LEMBARAN PEMERIKSAAN MUTU GRADING", 105, 29, {align: 'center'});
+
+            // Add a line under header
+            doc.setDrawColor(100, 100, 100);
+            doc.line(15, 35, 195, 35);
+
+            // Informasi Umum
+            doc.setFontSize(10);
+            let yPosition = 45;
+
+            doc.text(`No. Tiket: ${document.getElementById('No_Tiket').value}`, 20, yPosition);
+            doc.text(`Tanggal: ${document.getElementById('Tanggal').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`No. Kendaraan: ${document.getElementById('No_Kendaraan').value}`, 20, yPosition);
+            doc.text(`Divisi/Estate: ${document.getElementById('Divisi_Estate').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`Jam Tiba/Grading: ${document.getElementById('Jam_Tiba_Grading').value}`, 20, yPosition);
+            doc.text(`Blok/Thn. Tanam: ${document.getElementById('Blok_Thn_Tanam').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`No. Trip: ${document.getElementById('No_Trip').value}`, 20, yPosition);
+            doc.text(`Berat Bersih: ${document.getElementById('Berat_Bersih').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`Jumlah Janjang SPB: ${document.getElementById('Jumlah_Janjang_SPB').value}`, 20, yPosition);
+            doc.text(`BJR: ${document.getElementById('BJR').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`Janjang di Grading: ${document.getElementById('Janjang_di_Grading').value}`, 20, yPosition);
+            doc.text(`Minimum Kematangan Panen: ${document.getElementById('Minimum_Kematangan_Panen').value}`, 110, yPosition);
+            yPosition += 7;
+
+            doc.text(`Brondolan Lepas Janjang: ${document.getElementById('Brondolan_Lepas_Janjang').value}`, 20, yPosition);
+            yPosition += 12;
+
+            // Tabel A
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.text("A. Kematangan dan Persentase (%) Brondolan Lepas", 15, yPosition);
+            yPosition += 7;
+
+            const headersA = [["GOLONGAN", "JUMLAH", "%", "TARGET"]];
+            const dataA = [
+                ["Buah Mentah", document.getElementById('buah_mentah_jumlah').value, document.getElementById('buah_mentah_persen').value, "0%"],
+                ["Buah Matang", document.getElementById('buah_matang_jumlah').value, document.getElementById('buah_matang_persen').value, "max 92%"],
+                ["Buah Terlalu Matang", document.getElementById('buah_terlalu_matang_jumlah').value, document.getElementById('buah_terlalu_matang_persen').value, "max 5%"],
+                ["Janjang Kosong", document.getElementById('janjang_kosong_jumlah').value, document.getElementById('janjang_kosong_persen').value, "0%"],
+                ["Total Buah Normal", document.getElementById('total_buah_normal_jumlah').value, document.getElementById('total_buah_normal_persen').value, "max 96%"],
+                ["Parthenocarpic", document.getElementById('parthenocarpic_jumlah').value, document.getElementById('parthenocarpic_persen').value, "0%"],
+                ["Buah Keras (Hard Bunch)", document.getElementById('buah_keras_jumlah').value, document.getElementById('buah_keras_persen').value, "max 3%"],
+                ["Total Buah Abnormal", document.getElementById('total_buah_abnormal_jumlah').value, document.getElementById('total_buah_abnormal_persen').value, "max 3%"],
+                ["GRAND TOTAL", document.getElementById('grand_total_jumlah').value, document.getElementById('grand_total_persen').value, ""],
+                ["Brondolan Lepas", document.getElementById('brondolan_lepas_jumlah').value, document.getElementById('brondolan_lepas_persen').value, "8%"]
+            ];
+
+            doc.autoTable({
+                head: headersA,
+                body: dataA,
+                startY: yPosition,
+                margin: {left: 15},
+                styles: {fontSize: 9, cellPadding: 2},
+                headStyles: {fillColor: [44, 62, 80]}
+            });
+
+            // Tabel B
+            yPosition = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(11);
+            doc.text("B. Kerusakan Akibat Hama Tikus", 15, yPosition);
+            yPosition += 7;
+
+            const headersB = [["KATEGORI", "JUMLAH", "%", "TARGET"]];
+            const dataB = [
+                ["Kerusakan Ringan", document.getElementById('rusak_ringan_jumlah').value, document.getElementById('rusak_ringan_persen').value, "max 95%"],
+                ["Kerusakan Sedang", document.getElementById('rusak_sedang_jumlah').value, document.getElementById('rusak_sedang_persen').value, "max 5%"],
+                ["Kerusakan Berat", document.getElementById('rusak_berat_jumlah').value, document.getElementById('rusak_berat_persen').value, "0%"]
+            ];
+
+            doc.autoTable({
+                head: headersB,
+                body: dataB,
+                startY: yPosition,
+                margin: {left: 15},
+                styles: {fontSize: 9, cellPadding: 2},
+                headStyles: {fillColor: [44, 62, 80]}
+            });
+
+            // Footer
+            yPosition = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10);
+            doc.text(`Batu Kerikil/Sampah: ${document.getElementById('batu_kerikil').value} kg`, 15, yPosition);
+            yPosition += 7;
+            doc.text(`Comment: ${document.getElementById('comment').value}`, 15, yPosition);
+            yPosition += 15;
+
+            // Tambahkan foto ke PDF jika ada
+            if (uploadedPhotos.length > 0) {
+                yPosition += 5;
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+                doc.text("Foto Dokumentasi:", 15, yPosition);
+                yPosition += 7;
+
+                // Batasi jumlah foto yang ditambahkan ke PDF untuk menghindari ukuran file yang terlalu besar
+                const photosToAdd = uploadedPhotos.slice(0, 3); // Maksimal 3 foto
+
+                photosToAdd.forEach((photo, index) => {
+                    if (yPosition > 250) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+
+                    try {
+                        // Tambahkan foto ke PDF
+                        doc.addImage(photo.dataUrl, 'JPEG', 15, yPosition, 80, 60);
+                        yPosition += 65;
+                    } catch (error) {
+                        console.error("Gagal menambahkan foto ke PDF:", error);
+                    }
+                });
+            }
+
+            // Tanda tangan
+            if (yPosition > 200) {
+                doc.addPage();
+                yPosition = 20;
+            }
+
+            doc.setFontSize(10);
+            doc.text("Team Grading", 30, yPosition);
+            doc.text(document.getElementById('team_grading').value, 30, yPosition + 10);
+            doc.text("(........................)", 30, yPosition + 20);
+
+            doc.text("Asst. Lab/Kabag", 105, yPosition);
+            doc.text(document.getElementById('asst_lab').value, 105, yPosition + 10);
+            doc.text("(........................)", 105, yPosition + 20);
+
+            doc.text("Mill Manager", 160, yPosition);
+            doc.text(document.getElementById('mill_manager').value, 160, yPosition + 10);
+            doc.text("(........................)", 160, yPosition + 20);
+
+            // Simpan PDF
+            const fileName = `Grading_Kelapa_Sawit_${document.getElementById('No_Tiket').value || 'Report'}.pdf`;
+            doc.save(fileName);
+        }
+
+        function resetForm() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.type !== 'file' && input.type !== 'button') {
+                    input.value = '';
+                }
+            });
+
+            // Hapus semua foto
+            uploadedPhotos = [];
+            document.getElementById('photo-preview').innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>
